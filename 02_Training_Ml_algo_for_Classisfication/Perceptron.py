@@ -72,22 +72,23 @@ class perceptron:
         ''' Return class label after unit step '''
         return np.where(self.net_input(x) >= 0.0, 1, -1)
 
-    
-x= np.array([[2,3],[3,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,9]])
-y= np.array([0,0,0,0,1,1,1,1])
+if __name__ == "__main__":
 
-ppn= perceptron(eta=0.1,
-                n_iter=10,
-                random_state=1)
+    x= np.array([[2,3],[3,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,9]])
+    y= np.array([0,0,0,0,1,1,1,1])
 
-ppn.fit(x,y)
+    ppn= perceptron(eta=0.1,
+                    n_iter=10,
+                    random_state=1)
 
-" now let's check result "
+    ppn.fit(x,y)
 
-print("Weight: ", ppn.w_)
-print("Bias: ", ppn.b_)
-print("Errors: ", ppn.errors_)
+    " now let's check result "
 
-y_pred= ppn.predict(x)
-print("Prediction: ", y_pred)
-print("Actual: ", y)
+    print("Weight: ", ppn.w_)
+    print("Bias: ", ppn.b_)
+    print("Errors: ", ppn.errors_)
+
+    y_pred= ppn.predict(x)
+    print("Prediction: ", y_pred)
+    print("Actual: ", y)
