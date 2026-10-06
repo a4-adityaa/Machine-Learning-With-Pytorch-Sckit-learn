@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class AdalineGD:
     ''' ADAdaptive LInear neuraon classifier.
@@ -72,11 +73,83 @@ class AdalineGD:
         ''' Calculate net input '''
         return np.dot(x, self.w_) + self.b_
 
-    def activations(self, x):
+    def activation(self, x):
         ''' Compute linear activation '''
         return x
 
     def predict(self, x):
         ''' Return class label after unit step '''
         return np.where(self.activation(self.net_input(x)) >= 0.0, 1, -1)
+
+        # for w_j in range(self.w_.shape[0]):
+        #     self.w[w_j] += self.eta*(2.0 *(x[:,w_j]*errors)).mean()
         
+        self.w_ += self.eta * 2.0 * x.T.dot(errors) / x.shape[0]
+
+
+df= pd.read_csv(r"D:\Machine Learning With Pytorch & Sckit~learn\iris.data",
+                header=None, encoding='utf+8')
+
+# print(df.tail())
+" now plot graphs to visulize "
+
+# select setosa and versicolor
+y= df.iloc[0:100,4].values  # selects data [0:100] and 4 says 4th column
+y= np.where(y=='Iris-setosa',-1,1) # used for classification i.e if 0 then setosa elseif 1 then versicolor
+
+# extract sepal and petal length
+x= df.iloc[0:100, [0,2]].values 
+
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
+ada1 = AdalineGD(n_iter=15, eta=0.1).fit(x, y)
+ax[0].plot(range(1, len(ada1.loss_) + 1),
+           np.log10(ada1.loss_), marker='o')
+ax[0].set_xlabel('Epochs')
+ax[0].set_ylabel('log(Mean squared error)')
+ax[0].set_title('Adaline - Learning rate 0.1')
+ada2 = AdalineGD(n_iter=15, eta=0.0001).fit(x, y)
+ax[1].plot(range(1, len(ada2.loss_) + 1),
+           ada2.loss_, marker='o')
+ax[1].set_xlabel('Epochs')
+ax[1].set_ylabel('Mean squared error')
+ax[1].set_title('Adaline - Learning rate 0.0001')
+plt.tight_layout()
+plt.show()
+
+" now let's standarlize our data "
+
+x_std= np.copy(x)
+x_std[:,0] = (x[:,0] - x[:,0].mean()) / x[:,0].std()
+x_std[:,1] = (x[:,1] - x[:,1].mean()) / x[:,1].std()
+
+" now we will create new instance and pass our standarlized data "
+ada_gd = AdalineGD(n_iter=20, eta=0.01)
+ada_gd.fit(x_std,y)
+
+" now visulize "
+from Training_irisData import plot_decision_regions
+
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))   
+
+plt.sca(ax[0])                                               
+
+plot_decision_regions(x_std, y, classifier=ada_gd)
+
+ax[0].set_title('Adaline - Gradient descent')             
+ax[0].set_xlabel('Sepal length [standardized]')             
+ax[0].set_ylabel('Petal length [standardized]')             
+ax[0].legend(loc='upper left')                             
+
+
+ax[1].plot(
+    range(1, len(ada_gd.loss_) + 1),
+    ada_gd.loss_,
+    marker='o'
+)                                                          
+
+ax[1].set_xlabel('Epochs')                                   
+ax[1].set_ylabel('Mean squared error')                       
+ax[1].set_title('Adaline - Gradient descent')                
+
+plt.tight_layout()
+plt.show()                                                    
